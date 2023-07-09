@@ -1,4 +1,30 @@
 use starknet::ContractAddress;
+use array::ArrayTrait;
+
+#[derive(Serde, Drop)]
+struct StorageSlot {
+    word_1: felt252,
+    word_2: felt252,
+    word_3: felt252,
+    word_4: felt252
+}
+
+#[starknet::interface]
+trait IEvmFactsRegistry<TContractState> {
+    fn get_storage_uint(
+        self: TContractState,
+        block: felt252,
+        account_160: felt252,
+        slot: StorageSlot,
+        proof_sizes_bytes_len: felt252,
+        proof_sizes_bytes: Array<felt252>,
+        proof_sizes_words_len: felt252,
+        proof_sizes_words: Array<felt252>,
+        proofs_concat_len: felt252,
+        proofs_concat: Array<felt252>
+    ) -> felt252;
+}
+
 
 #[starknet::interface]
 trait IERC20<TContractState> {
@@ -25,6 +51,8 @@ mod erc_20 {
     use starknet::get_caller_address;
     use starknet::contract_address_const;
     use starknet::ContractAddress;
+    use super::IEvmFactsRegistryDispatcherTrait;
+    use super::IEvmFactsRegistryDispatcher;
 
     #[storage]
     struct Storage {
@@ -56,28 +84,10 @@ mod erc_20 {
     }
 
     #[constructor]
-    fn constructor(
-        ref self: ContractState,
-        name_: felt252,
-        symbol_: felt252,
-        decimals_: u8,
-        initial_supply: u256,
-        recipient: ContractAddress
-    ) {
+    fn constructor(ref self: ContractState, name_: felt252, symbol_: felt252, decimals_: u8, ) {
         self.name.write(name_);
         self.symbol.write(symbol_);
         self.decimals.write(decimals_);
-        assert(!recipient.is_zero(), 'ERC20: mint to the 0 address');
-        self.total_supply.write(initial_supply);
-        self.balances.write(recipient, initial_supply);
-        self
-            .emit(
-                Event::Transfer(
-                    Transfer {
-                        from: contract_address_const::<0>(), to: recipient, value: initial_supply
-                    }
-                )
-            );
     }
 
     #[external(v0)]
@@ -149,6 +159,17 @@ mod erc_20 {
                 );
         }
     }
+
+    #[external(v0)]
+    #[generate_trait]
+    impl BridgeImpl of BridgeTrait {
+        fn unlock_bridge() {
+            IEvmFactsRegistryDispatcher {
+                contract_address: ContractAddress::<0x07c88f02f0757b25547af4d946445f92dbe3416116d46d7b2bd88bcfad65a06f>
+            }.get_storage_uint();
+        }
+    }
+
 
     #[generate_trait]
     impl StorageImpl of StorageTrait {
