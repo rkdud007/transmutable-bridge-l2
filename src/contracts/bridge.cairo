@@ -19,7 +19,7 @@ trait IEvmFactsRegistry<TContractState> {
         proof_sizes_bytes: Array<felt252>,
         proof_sizes_words: Array<felt252>,
         proofs_concat: Array<felt252>
-    ) -> felt252;
+    ) -> u256;
 }
 
 
@@ -163,7 +163,9 @@ mod erc_20 {
     #[generate_trait]
     impl BridgeImpl of BridgeTrait {
         fn unlock_bridge(
-            self: @ContractState,
+            ref self: ContractState,
+            amount: u256,
+            user: ContractAddress,
             block: felt252,
             account_160: felt252,
             slot: StorageSlot,
@@ -171,7 +173,7 @@ mod erc_20 {
             proof_sizes_words: Array<felt252>,
             proofs_concat: Array<felt252>
         ) {
-            IEvmFactsRegistryDispatcher {
+            let amount = IEvmFactsRegistryDispatcher {
                 contract_address: contract_address_const::<0x041fd22b238fa21cfcf5dd45a8548974d8263b3a531a60388411c5e230f97023>(),
             }.get_storage_uint(
                 block: block,
@@ -181,6 +183,7 @@ mod erc_20 {
                 proof_sizes_words: proof_sizes_words,
                 proofs_concat: proofs_concat
             );
+            self.mint(user, amount);
         }
     }
     
