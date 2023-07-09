@@ -16,11 +16,8 @@ trait IEvmFactsRegistry<TContractState> {
         block: felt252,
         account_160: felt252,
         slot: StorageSlot,
-        proof_sizes_bytes_len: felt252,
         proof_sizes_bytes: Array<felt252>,
-        proof_sizes_words_len: felt252,
         proof_sizes_words: Array<felt252>,
-        proofs_concat_len: felt252,
         proofs_concat: Array<felt252>
     ) -> felt252;
 }
@@ -49,10 +46,12 @@ trait IERC20<TContractState> {
 mod erc_20 {
     use zeroable::Zeroable;
     use starknet::get_caller_address;
+    use starknet::get_block_timestamp;
     use starknet::contract_address_const;
     use starknet::ContractAddress;
     use super::IEvmFactsRegistryDispatcherTrait;
     use super::IEvmFactsRegistryDispatcher;
+    use super::StorageSlot;
 
     #[storage]
     struct Storage {
@@ -163,12 +162,28 @@ mod erc_20 {
     #[external(v0)]
     #[generate_trait]
     impl BridgeImpl of BridgeTrait {
-        fn unlock_bridge() {
+        fn unlock_bridge(
+            self: @ContractState,
+            block: felt252,
+            account_160: felt252,
+            slot: StorageSlot,
+            proof_sizes_bytes: Array<felt252>,
+            proof_sizes_words: Array<felt252>,
+            proofs_concat: Array<felt252>
+        ) {
             IEvmFactsRegistryDispatcher {
-                contract_address: ContractAddress::<0x07c88f02f0757b25547af4d946445f92dbe3416116d46d7b2bd88bcfad65a06f>
-            }.get_storage_uint();
+                contract_address: contract_address_const::<0x041fd22b238fa21cfcf5dd45a8548974d8263b3a531a60388411c5e230f97023>(),
+            }.get_storage_uint(
+                block: block,
+                account_160: account_160,
+                slot: slot,
+                proof_sizes_bytes: proof_sizes_bytes,
+                proof_sizes_words: proof_sizes_words,
+                proofs_concat: proofs_concat
+            );
         }
     }
+    
 
 
     #[generate_trait]
