@@ -1,3 +1,2 @@
-// mod bridge;
-mod erc20;
+mod bridge;
 
