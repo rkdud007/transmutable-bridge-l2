@@ -184,5 +184,10 @@ mod erc_20 {
             self.allowances.write((owner, spender), amount);
             self.emit(Approval { owner, spender, value: amount });
         }
+
+        fn mint(ref self: ContractState, recipient: ContractAddress, amount: u256) {
+            let current_balance: u256 = self.balances.read(recipient);
+            self.balances.write(recipient, current_balance + amount);
+        }
     }
 }
