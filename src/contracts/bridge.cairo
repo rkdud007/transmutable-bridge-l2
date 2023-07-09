@@ -159,6 +159,7 @@ mod erc_20 {
         }
     }
 
+    // TODO: add nonce to prevent user from minting multiple times
     #[external(v0)]
     #[generate_trait]
     impl BridgeImpl of BridgeTrait {
