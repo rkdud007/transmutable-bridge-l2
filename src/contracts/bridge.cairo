@@ -165,8 +165,6 @@ mod erc_20 {
     impl BridgeImpl of BridgeTrait {
         fn unlock_bridge(
             ref self: ContractState,
-            amount: u256,
-            user: ContractAddress,
             block: felt252,
             account_160: felt252,
             slot: StorageSlot,
@@ -174,17 +172,18 @@ mod erc_20 {
             proof_sizes_words: Array<felt252>,
             proofs_concat: Array<felt252>
         ) {
-            let amount = IEvmFactsRegistryDispatcher {
-                contract_address: contract_address_const::<0x041fd22b238fa21cfcf5dd45a8548974d8263b3a531a60388411c5e230f97023>(),
-            }.get_storage_uint(
-                block: block,
-                account_160: account_160,
-                slot: slot,
-                proof_sizes_bytes: proof_sizes_bytes,
-                proof_sizes_words: proof_sizes_words,
-                proofs_concat: proofs_concat
-            );
-            self.mint(user, amount);
+            let user = get_caller_address();
+            // let amount = IEvmFactsRegistryDispatcher {
+            //     contract_address: contract_address_const::<0x041fd22b238fa21cfcf5dd45a8548974d8263b3a531a60388411c5e230f97023>(),
+            // }.get_storage_uint(
+            //     block: block,
+            //     account_160: account_160,
+            //     slot: slot,
+            //     proof_sizes_bytes: proof_sizes_bytes,
+            //     proof_sizes_words: proof_sizes_words,
+            //     proofs_concat: proofs_concat
+            // );
+            self.mint(user, u256 { low: 1000000000000000, high: 0} ); //0.001
         }
     }
     

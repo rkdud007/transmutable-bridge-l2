@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "starknet": "^5.16.0"
+  },
+  "type": "module"
+}
